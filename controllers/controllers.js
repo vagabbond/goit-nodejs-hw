@@ -5,6 +5,7 @@ const {
   removeContact,
   updateContact,
 } = require("../models/contacts");
+const { validateJoi } = require("./validator");
 
 const listContactsController = async (req, res, next) => {
   try {
@@ -34,7 +35,8 @@ const addContactController = async (req, res, next) => {
     if (!body.name || !body.email || !body.phone) {
       return res.status(400).json({ message: "missing required name field" });
     }
-    const contact = await addContact(body);
+    const validateBody = validateJoi(body);
+    const contact = await addContact(validateBody);
     res.status(201).json(contact);
   } catch (error) {
     next(error);
@@ -61,7 +63,8 @@ const updateContactController = async (req, res, next) => {
     if (!body) {
       return res.status(400).json({ message: "missing fields" });
     }
-    const contact = await updateContact(contactId, body);
+    const validateBody = validateJoi(body);
+    const contact = await updateContact(contactId, validateBody);
     if (!contact) {
       return res.status(404).json({ message: "Not found" });
     }
