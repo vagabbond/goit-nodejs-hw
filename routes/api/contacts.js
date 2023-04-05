@@ -9,15 +9,19 @@ const {
   removeContactController,
   updateContactController,
 } = require("../../controllers/controllers");
+const {
+  validateAddData,
+  validatePutData,
+} = require("../../controllers/validator");
 
 router.get("/", listContactsController);
 
 router.get("/:contactId", getContactByIdController);
 
-router.post("/", addContactController);
+router.post("/", validateAddData, addContactController);
 
 router.delete("/:contactId", removeContactController);
 
-router.put("/:contactId", updateContactController);
+router.put("/:contactId", validatePutData, updateContactController);
 
 module.exports = router;
