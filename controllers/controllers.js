@@ -1,10 +1,11 @@
 const {
   listContacts,
   getContactById,
-  addContact,
+  createContact,
   removeContact,
   updateContact,
-} = require("../models/contacts");
+  updateStatusContact,
+} = require("../service/index");
 
 const listContactsController = async (req, res, next) => {
   try {
@@ -31,7 +32,7 @@ const getContactByIdController = async (req, res, next) => {
 const addContactController = async (req, res, next) => {
   try {
     const { body } = req;
-    const contact = await addContact(body);
+    const contact = await createContact(body);
     return res.status(201).json(contact);
   } catch (error) {
     next(error);
@@ -64,11 +65,24 @@ const updateContactController = async (req, res, next) => {
     next(error);
   }
 };
-
+const updateStatusControler = async (req, res, next) => {
+  try {
+    const { contactId } = req.params;
+    const { favorite } = req.body;
+    const contact = await updateStatusContact(contactId, { favorite });
+    if (!contact) {
+      return res.status(404).json({ message: "Not found" });
+    }
+    res.status(200).json(contact);
+  } catch (error) {
+    next(error);
+  }
+};
 module.exports = {
   listContactsController,
   getContactByIdController,
   addContactController,
   removeContactController,
   updateContactController,
+  updateStatusControler,
 };
