@@ -7,7 +7,7 @@ const {
   validatePutData,
   validateFavoriteSchema,
 } = require("../../controllers/validator");
-
+const isValidId = require("../../controllers/isValidId");
 const {
   listContactsController,
   getContactByIdController,
@@ -19,16 +19,17 @@ const {
 
 router.get("/", listContactsController);
 
-router.get("/:contactId", getContactByIdController);
+router.get("/:contactId", isValidId, getContactByIdController);
 
 router.post("/", validateAddData, addContactController);
 
-router.delete("/:contactId", removeContactController);
+router.delete("/:contactId", isValidId, removeContactController);
 
-router.put("/:contactId", validatePutData, updateContactController);
+router.put("/:contactId", isValidId, validatePutData, updateContactController);
 
 router.patch(
   "/:contactId/favorite",
+  isValidId,
   validateFavoriteSchema,
   updateStatusControler
 );

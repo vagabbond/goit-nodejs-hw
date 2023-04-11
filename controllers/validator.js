@@ -1,5 +1,5 @@
 const Joi = require("joi");
-const { validateError } = require("./errorHandler");
+
 module.exports = {
   validateAddData: (req, res, next) => {
     const addSchema = Joi.object({
@@ -7,15 +7,24 @@ module.exports = {
       email: Joi.string().required(),
       phone: Joi.string().required(),
     });
-    const { name, email, phone, favorite } = req.body;
-    !name && !email && !phone && !favorite
-      ? validateError(req, addSchema, 400, "missing fields")
-      : !name
-      ? validateError(req, addSchema, 400, "missing required name field")
-      : !email
-      ? validateError(req, addSchema, 400, "missing required email field")
-      : !phone &&
-        validateError(req, addSchema, 400, "missing required phone field");
+    const { error } = addSchema.validate(req.body);
+    if (!req.body.name) {
+      return res.status(400).json({
+        message: "missing required name field",
+      });
+    } else if (!req.body.email) {
+      return res.status(400).json({
+        message: "missing required email field",
+      });
+    } else if (!req.body.phone) {
+      return res.status(400).json({
+        message: "missing required phone field",
+      });
+    } else if (error) {
+      return res.status(400).json({
+        message: "missing fields",
+      });
+    }
     next();
   },
   validatePutData: (req, res, next) => {
@@ -24,24 +33,25 @@ module.exports = {
       email: Joi.string().required(),
       phone: Joi.string().required(),
     });
-    const { name, email, phone, favorite } = req.body;
-    !name &&
-      !email &&
-      !phone &&
-      !favorite &&
-      validateError(req, addSchema, 400, "missing fields");
+    const { error } = addSchema.validate(req.body);
+    if (error) {
+      return res.status(400).json({
+        message: "missing fields",
+      });
+    }
     next();
   },
+
   validateFavoriteSchema: (req, res, next) => {
     const schema = Joi.object({
       favorite: Joi.boolean().required(),
     });
-    const { favorite } = req.body;
-    if (!favorite) {
-      validateError(req, schema, 400, "missing field favorite");
-      next();
+    const { error } = schema.validate(req.body);
+    if (error) {
+      return res.status(400).json({
+        message: "missing field favorite",
+      });
     }
-    console.log("validateFavorite");
     next();
   },
 };
