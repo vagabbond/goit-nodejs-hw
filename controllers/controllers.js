@@ -9,7 +9,8 @@ const {
 
 const listContactsController = async (req, res, next) => {
   try {
-    const contacts = await listContacts();
+    const { _id: owner } = req.user;
+    const contacts = await listContacts(owner);
     res.status(200).json(contacts);
   } catch (error) {
     next(error);
@@ -31,8 +32,9 @@ const getContactByIdController = async (req, res, next) => {
 
 const addContactController = async (req, res, next) => {
   try {
+    const { _id: owner } = req.user;
     const { body } = req;
-    const contact = await createContact(body);
+    const contact = await createContact({ body, owner });
     return res.status(201).json(contact);
   } catch (error) {
     next(error);
