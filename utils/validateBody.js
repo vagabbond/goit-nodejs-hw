@@ -3,7 +3,7 @@ const validateBody = (schema) => {
     const { error } = schema.validate(req.body);
     if (error) {
       return res.status(400).json({
-        message: " Bad request",
+        message: " Email or password is wrong",
       });
     }
     next();

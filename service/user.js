@@ -5,7 +5,6 @@ const userSchema = new Schema(
   {
     name: {
       type: String,
-      required: true,
     },
     email: {
       type: String,
@@ -20,6 +19,11 @@ const userSchema = new Schema(
     token: {
       type: String,
       default: "",
+    },
+    subscription: {
+      type: String,
+      enum: ["starter", "pro", "business"],
+      default: "starter",
     },
   },
   { versionKey: false }

@@ -22,6 +22,7 @@ const register = async (req, res, next) => {
 
     res.status(201).json({
       email: result.email,
+      subscription: result.subscription,
     });
   } catch (error) {
     next(error);
@@ -55,20 +56,25 @@ const login = async (req, res, next) => {
       token,
       user: {
         email: user.email,
+        subscription: user.subscription,
       },
     });
   } catch (error) {
-    next(error);
+    next(
+      res.status(401).json({
+        message: "Email or password is wrong",
+      })
+    );
   }
 };
 
 const getCurrent = async (req, res, next) => {
   try {
-    const { name, email } = req.user;
+    const { email, subscription } = req.user;
 
     res.json({
-      name,
       email,
+      subscription,
     });
   } catch (error) {
     next(error);
