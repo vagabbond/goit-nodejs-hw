@@ -107,6 +107,11 @@ const logout = async (req, res, next) => {
 };
 const updateAvatar = async (req, res, next) => {
   try {
+    if (!req.file) {
+      return res.status(401).json({
+        message: "Not found file",
+      });
+    }
     const { _id } = req.user;
     const { path: tempUpload, filename } = req.file;
 
