@@ -1,11 +1,16 @@
 const bcrypt = require("bcryptjs");
 require("dotenv").config();
 const jwt = require("jsonwebtoken");
+const gavatar = require("gravatar");
+const fs = require("fs/promises");
+const path = require("path");
+
+const avatarsDir = path.join(__dirname, "../", "public/avatars");
 
 const { User } = require("../service/user");
+const Jimp = require("jimp");
 
 const { SECRET_KEY } = process.env;
-
 const register = async (req, res, next) => {
   try {
     const { email, password } = req.body;
@@ -17,8 +22,13 @@ const register = async (req, res, next) => {
     }
 
     const hashPassword = await bcrypt.hash(password, 10);
+    const avatarURL = gavatar.url(email);
 
-    const result = await User.create({ ...req.body, password: hashPassword });
+    const result = await User.create({
+      ...req.body,
+      password: hashPassword,
+      avatarURL,
+    });
 
     res.status(201).json({
       user: {
@@ -95,10 +105,43 @@ const logout = async (req, res, next) => {
     next(error);
   }
 };
+const updateAvatar = async (req, res, next) => {
+  try {
+    if (!req.file) {
+      return res.status(401).json({
+        message: "Not found file",
+      });
+    }
+    const { _id } = req.user;
+    const { path: tempUpload, filename } = req.file;
+
+    const avatarName = `${_id}_${filename}`;
+
+    const resultUpload = path.join(avatarsDir, avatarName);
+    const avatarURL = path.join("avatars", avatarName);
+    try {
+      await fs.rename(tempUpload, resultUpload);
+      const avatar = await Jimp.read(resultUpload);
+      avatar.resize(250, 250);
+      avatar.write(resultUpload);
+    } catch (error) {
+      await fs.unlink(tempUpload);
+      throw error;
+    }
+
+    await User.findByIdAndUpdate(_id, { avatarURL });
+    res.status(200).json({
+      avatarURL,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 
 module.exports = {
   register,
   login,
   getCurrent,
   logout,
+  updateAvatar,
 };
