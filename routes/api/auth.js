@@ -2,6 +2,8 @@ const express = require("express");
 const validateBody = require("../../utils/validateBody");
 const {
   register,
+  verifyEmail,
+  resendVerifyEmail,
   login,
   getCurrent,
   logout,
@@ -17,6 +19,10 @@ const { schemas } = require("../../service/user");
 const router = express.Router();
 
 router.post("/register", validateBody(schemas.registerSchema), register);
+
+router.get("/verify/:verificationCode", verifyEmail);
+
+router.post("/verify", validateBody(schemas.emailSchema), resendVerifyEmail);
 
 router.post("/login", validateBody(schemas.loginSchema), login);
 
